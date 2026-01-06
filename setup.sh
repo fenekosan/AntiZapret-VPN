@@ -77,7 +77,7 @@ echo '        +MSK-IX+NSDI *'
 echo '    2) Cloudflare+Quad9  - Use if default choice fails to resolve domains'
 echo '    3) Comss **          - More details: https://comss.ru/disqus/page.php?id=7315'
 echo '    4) Xbox **           - More details: https://xbox-dns.ru'
-echo '    5) Malw **           - More details: https://info.dns.malw.link'
+echo '    5) Malw-fin **           - More details: https://info.dns.malw.link'
 echo
 echo '  * - DNS resolvers optimized for users located in Russia'
 echo ' ** - Enable additional proxying and hide this server IP on some internet resources'
@@ -94,7 +94,7 @@ echo '    4) Google *     - Use if Self-hosted/Cloudflare/Quad9 fails to resolve
 echo '    5) AdGuard *    - Use for blocking ads, trackers, malware and phishing websites'
 echo '    6) Comss **     - More details: https://comss.ru/disqus/page.php?id=7315'
 echo '    7) Xbox **      - More details: https://xbox-dns.ru'
-echo '    8) Malw **      - More details: https://info.dns.malw.link'
+echo '    8) Malw-fin **      - More details: https://info.dns.malw.link'
 echo
 echo '  * - DNS resolvers supports EDNS Client Subnet'
 echo ' ** - Enable additional proxying and hide this server IP on some internet resources'
@@ -439,8 +439,8 @@ elif [[ "$ANTIZAPRET_DNS" == "4" ]]; then
 	sed -i "s/'1\.1\.1\.1', '1\.0\.0\.1', '9\.9\.9\.10', '149\.112\.112\.10'/'176.99.11.77', '80.78.247.254'/" /etc/knot-resolver/kresd.conf
 elif [[ "$ANTIZAPRET_DNS" == "5" ]]; then
 	# Malw
-	sed -i "s/'62\.76\.76\.62', '62\.76\.62\.76', '195\.208\.4\.1', '195\.208\.5\.1'/'84.21.189.133', '64.188.98.242'/" /etc/knot-resolver/kresd.conf
-	sed -i "s/'1\.1\.1\.1', '1\.0\.0\.1', '9\.9\.9\.10', '149\.112\.112\.10'/'84.21.189.133', '64.188.98.242'/" /etc/knot-resolver/kresd.conf
+	sed -i "s/'62\.76\.76\.62', '62\.76\.62\.76', '195\.208\.4\.1', '195\.208\.5\.1'/'94.237.15.152'/" /etc/knot-resolver/kresd.conf
+	sed -i "s/'1\.1\.1\.1', '1\.0\.0\.1', '9\.9\.9\.10', '149\.112\.112\.10'/'94.237.15.152'/" /etc/knot-resolver/kresd.conf
 fi
 
 #
@@ -467,8 +467,8 @@ elif [[ "$VPN_DNS" == "7" ]]; then
 	sed -i 's/1\.1\.1\.1, 1\.0\.0\.1/176.99.11.77, 80.78.247.254/' /etc/wireguard/templates/vpn-client*.conf
 elif [[ "$VPN_DNS" == "8" ]]; then
 	# Malw
-	sed -i '/push "dhcp-option DNS 1\.1\.1\.1"/,+1c push "dhcp-option DNS 84.21.189.133"\npush "dhcp-option DNS 64.188.98.242"' /etc/openvpn/server/vpn*.conf
-	sed -i 's/1\.1\.1\.1, 1\.0\.0\.1/84.21.189.133, 64.188.98.242/' /etc/wireguard/templates/vpn-client*.conf
+	sed -i '/push "dhcp-option DNS 1\.1\.1\.1"/,+1c push "dhcp-option DNS 94.237.15.152"' /etc/openvpn/server/vpn*.conf
+	sed -i 's/1\.1\.1\.1, 1\.0\.0\.1/94.237.15.152/' /etc/wireguard/templates/vpn-client*.conf
 fi
 
 #
