@@ -104,7 +104,7 @@ echo '                           Register account (Family plan) and add this ser
 echo '    3) Cloudflare+Quad9  - Use if default choice fails to resolve domains'
 echo '    4) Comss **          - More details: https://comss.ru/disqus/page.php?id=7315'
 echo '    5) XBox **           - More details: https://xbox-dns.ru'
-echo '    6) Malw **           - More details: https://info.dns.malw.link'
+echo '    6) Malw-fin **           - More details: https://info.dns.malw.link'
 echo
 echo '  * - DNS resolvers optimized for users located in Russia'
 echo ' ** - Enable additional proxying and hide this server IP on some internet resources'
@@ -121,7 +121,7 @@ echo '    4) Google *     - Use if Self-hosted/Cloudflare/Quad9 fails to resolve
 echo '    5) AdGuard *    - Use for blocking ads, trackers, malware and phishing websites'
 echo '    6) Comss **     - More details: https://comss.ru/disqus/page.php?id=7315'
 echo '    7) XBox **      - More details: https://xbox-dns.ru'
-echo '    8) Malw **      - More details: https://info.dns.malw.link'
+echo '    8) Malw-fin **      - More details: https://info.dns.malw.link'
 echo
 echo '  * - DNS resolvers support EDNS Client Subnet'
 echo ' ** - Enable additional proxying and hide this server IP on some internet resources'
@@ -471,8 +471,8 @@ elif [[ "$ANTIZAPRET_DNS" == '5' ]]; then
 	sed -i "s/'1\.1\.1\.1', '1\.0\.0\.1', '9\.9\.9\.10', '149\.112\.112\.10'/'176.99.11.77', '80.78.247.254', '31.192.108.180'/" /etc/knot-resolver/kresd.conf
 elif [[ "$ANTIZAPRET_DNS" == '6' ]]; then
 	# Malw
-	sed -i "s/'62\.76\.76\.62', '62\.76\.62\.76', '193\.58\.251\.251'/'84.21.189.133', '193.23.209.189'/" /etc/knot-resolver/kresd.conf
-	sed -i "s/'1\.1\.1\.1', '1\.0\.0\.1', '9\.9\.9\.10', '149\.112\.112\.10'/'84.21.189.133', '193.23.209.189'/" /etc/knot-resolver/kresd.conf
+	sed -i "s/'62\.76\.76\.62', '62\.76\.62\.76', '195\.208\.4\.1', '195\.208\.5\.1'/'94.237.15.152'/" /etc/knot-resolver/kresd.conf
+	sed -i "s/'1\.1\.1\.1', '1\.0\.0\.1', '9\.9\.9\.10', '149\.112\.112\.10'/'94.237.15.152'/" /etc/knot-resolver/kresd.conf
 fi
 
 # Настраиваем DNS в full VPN
@@ -498,8 +498,8 @@ elif [[ "$VPN_DNS" == '7' ]]; then
 	sed -i 's/1\.1\.1\.1, 1\.0\.0\.1/176.99.11.77, 80.78.247.254, 31.192.108.180/' /etc/wireguard/templates/vpn-client*.conf
 elif [[ "$VPN_DNS" == '8' ]]; then
 	# Malw
-	sed -i '/push "dhcp-option DNS 1\.1\.1\.1"/,+1c push "dhcp-option DNS 84.21.189.133"\npush "dhcp-option DNS 193.23.209.189"' /etc/openvpn/server/vpn*.conf
-	sed -i 's/1\.1\.1\.1, 1\.0\.0\.1/84.21.189.133, 193.23.209.189/' /etc/wireguard/templates/vpn-client*.conf
+	sed -i '/push "dhcp-option DNS 1\.1\.1\.1"/,+1c push "dhcp-option DNS 94.237.15.152"' /etc/openvpn/server/vpn*.conf
+	sed -i 's/1\.1\.1\.1, 1\.0\.0\.1/94.237.15.152/' /etc/wireguard/templates/vpn-client*.conf
 fi
 
 # Используем альтернативные диапазоны подменных IPv4-адресов
