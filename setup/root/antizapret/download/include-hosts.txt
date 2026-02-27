@@ -248,6 +248,9 @@ seekvectorlogo.net
 cesium.com
 dyson.com
 dyson.nl
+dyson.de
+dyson.fr
+dyson.video
 informit.com
 getsafeonline.org
 scamadviser.com
@@ -701,7 +704,6 @@ jetbrains.com
 xe.com
 gql.twitch.tv
 live.chat.eveonline.com
-dyson.fr
 #labs.google
 squarecdn.com
 xgpuweb.gssv-play-prod.xboxlive.com
@@ -985,6 +987,16 @@ cdn77.org
 atlas.co
 sjinn.ai
 archlinuxarm.org
+disqus.com
+disquscdn.com
+picovr.com
+wahapedia.ru
+warhammer-community.com
+kawasaki.com
+quiver.ai
+kawasaki-global-admin.com
+browserleaks.com
+vast.ai
 
 # Блокирует DNS
 library.hydra.wiki

@@ -63,9 +63,10 @@ PostDown = ip rule del from $IP.28.0.0/15 lookup 13335 priority 10000
 [Peer]
 PublicKey = $PUBLIC_KEY
 AllowedIPs = 0.0.0.0/0
+PersistentKeepalive = 15
 Endpoint = $ENDPOINT" > $WARP_PATH
 
-	wg-quick up $WARP_PATH
+	wg-quick up $WARP_PATH 2>/dev/null
 
 	if [[ $? -eq 0 ]]; then
 		echo "Started $WARP_INTERFACE: $ENDPOINT connected"
@@ -124,9 +125,11 @@ if [[ "$RESTRICT_FORWARD" == 'y' ]]; then
 	} | ipset restore
 	iptables -w -I FORWARD 2 -s $IP.29.0.0/16 -m connmark --mark 0x1 -m set ! --match-set antizapret-forward dst -j DROP
 fi
-# Client isolation
+# Client and server isolation
 if [[ "$CLIENT_ISOLATION" == 'y' ]]; then
 	iptables -w -I FORWARD 2 ! -i $OUT_INTERFACE -d $IP.28.0.0/15 -j DROP
+	iptables -w -I INPUT 2 -s $IP.28.0.0/15 -p tcp ! --dport 53 -j DROP
+	iptables -w -I INPUT 2 -s $IP.28.0.0/15 -p udp ! --dport 53 -j DROP
 else
 	iptables -w -I FORWARD 2 -d $IP.28.0.0/15 -j ACCEPT
 fi
@@ -150,7 +153,7 @@ if [[ "$ATTACK_PROTECTION" == 'y' ]]; then
 	ipset create antizapret-watch hash:ip,port timeout 600 -exist
 	iptables -w -I INPUT 2 -i $DEFAULT_INTERFACE -p icmp --icmp-type echo-request -j DROP
 	iptables -w -I INPUT 3 -i $DEFAULT_INTERFACE -m set --match-set antizapret-allow src -j ACCEPT
-	iptables -w -I INPUT 4 -i $DEFAULT_INTERFACE -m conntrack --ctstate NEW -m set ! --match-set antizapret-watch src,dst -m hashlimit --hashlimit-above 10/hour --hashlimit-burst 10 --hashlimit-mode srcip --hashlimit-name antizapret-scan --hashlimit-htable-expire 600000 -j SET --add-set antizapret-block src --exist
+	iptables -w -I INPUT 4 -i $DEFAULT_INTERFACE -m conntrack --ctstate NEW -m set ! --match-set antizapret-watch src,dst -m hashlimit --hashlimit-above 20/hour --hashlimit-burst 20 --hashlimit-mode srcip --hashlimit-srcmask 24 --hashlimit-name antizapret-scan --hashlimit-htable-expire 600000 -j SET --add-set antizapret-block src --exist
 	iptables -w -I INPUT 5 -i $DEFAULT_INTERFACE -m conntrack --ctstate NEW -m hashlimit --hashlimit-above 100000/hour --hashlimit-burst 100000 --hashlimit-mode srcip --hashlimit-name antizapret-ddos --hashlimit-htable-expire 600000 -j SET --add-set antizapret-block src --exist
 	iptables -w -I INPUT 6 -i $DEFAULT_INTERFACE -m conntrack --ctstate NEW -m set --match-set antizapret-block src -j DROP
 	iptables -w -I INPUT 7 -i $DEFAULT_INTERFACE -m conntrack --ctstate NEW -j SET --add-set antizapret-watch src,dst --exist
@@ -161,7 +164,7 @@ if [[ "$ATTACK_PROTECTION" == 'y' ]]; then
 	ipset create antizapret-watch6 hash:ip,port timeout 600 family inet6 -exist
 	ip6tables -w -I INPUT 2 -i $DEFAULT_INTERFACE -p icmpv6 --icmpv6-type echo-request -j DROP
 	ip6tables -w -I INPUT 3 -i $DEFAULT_INTERFACE -m set --match-set antizapret-allow6 src -j ACCEPT
-	ip6tables -w -I INPUT 4 -i $DEFAULT_INTERFACE -m conntrack --ctstate NEW -m set ! --match-set antizapret-watch6 src,dst -m hashlimit --hashlimit-above 10/hour --hashlimit-burst 10 --hashlimit-mode srcip --hashlimit-name antizapret-scan6 --hashlimit-htable-expire 600000 -j SET --add-set antizapret-block6 src --exist
+	ip6tables -w -I INPUT 4 -i $DEFAULT_INTERFACE -m conntrack --ctstate NEW -m set ! --match-set antizapret-watch6 src,dst -m hashlimit --hashlimit-above 20/hour --hashlimit-burst 20 --hashlimit-mode srcip --hashlimit-srcmask 64 --hashlimit-name antizapret-scan6 --hashlimit-htable-expire 600000 -j SET --add-set antizapret-block6 src --exist
 	ip6tables -w -I INPUT 5 -i $DEFAULT_INTERFACE -m conntrack --ctstate NEW -m hashlimit --hashlimit-above 100000/hour --hashlimit-burst 100000 --hashlimit-mode srcip --hashlimit-name antizapret-ddos6 --hashlimit-htable-expire 600000 -j SET --add-set antizapret-block6 src --exist
 	ip6tables -w -I INPUT 6 -i $DEFAULT_INTERFACE -m conntrack --ctstate NEW -m set --match-set antizapret-block6 src -j DROP
 	ip6tables -w -I INPUT 7 -i $DEFAULT_INTERFACE -m conntrack --ctstate NEW -j SET --add-set antizapret-watch6 src,dst --exist

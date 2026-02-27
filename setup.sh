@@ -186,7 +186,7 @@ until [[ "$RESTRICT_FORWARD" =~ (y|n) ]]; do
 done
 echo
 until [[ "$CLIENT_ISOLATION" =~ (y|n) ]]; do
-	read -rp $'Enable \001\e[1;32m\002all VPN\001\e[0m\002 client isolation (block client-to-client access)? [y/n]: ' -e -i y CLIENT_ISOLATION
+	read -rp $'Enable \001\e[1;32m\002all VPN\001\e[0m\002 client and server isolation? [y/n]: ' -e -i y CLIENT_ISOLATION
 done
 echo
 while read -rp 'Enter valid domain name for this OpenVPN server or press Enter to skip: ' -e OPENVPN_HOST
@@ -206,7 +206,7 @@ until [[ "$ROUTE_ALL" =~ (y|n) ]]; do
 done
 echo
 until [[ "$DISCORD_INCLUDE" =~ (y|n) ]]; do
-	read -rp $'Include Discord voice IPs in \001\e[1;32m\002AntiZapret VPN\001\e[0m\002? [y/n]: ' -e -i n DISCORD_INCLUDE
+	read -rp $'Include Discord voice IPs in \001\e[1;32m\002AntiZapret VPN\001\e[0m\002? [y/n]: ' -e -i y DISCORD_INCLUDE
 done
 echo
 until [[ "$CLOUDFLARE_INCLUDE" =~ (y|n) ]]; do
@@ -268,6 +268,7 @@ systemctl disable --now openvpn-server@vpn-udp 2>/dev/null
 systemctl disable --now openvpn-server@vpn-tcp 2>/dev/null
 systemctl disable --now wg-quick@antizapret 2>/dev/null
 systemctl disable --now wg-quick@vpn 2>/dev/null
+systemctl disable --now kres-cache-gc 2>/dev/null
 
 # Удалим ненужные службы
 apt-get purge -y ufw
@@ -285,6 +286,7 @@ apt-get purge -y tuned
 apt-get purge -y sysstat
 apt-get purge -y acpid
 apt-get purge -y fwupd
+apt-get purge -y watchdog
 
 # SSH protection включён
 if [[ "$SSH_PROTECTION" == 'y' ]]; then
@@ -309,6 +311,9 @@ rm -rf /usr/local/src/openvpn
 sysctl -w net.ipv6.conf.all.disable_ipv6=1
 sysctl -w net.ipv6.conf.default.disable_ipv6=1
 sysctl -w net.ipv6.conf.lo.disable_ipv6=1
+
+# Удаляем переопределённые параметры ядра
+sed -i '/^$/!{/^#/!d}' /etc/sysctl.conf
 
 # Принудительная загрузка модуля nf_conntrack
 echo 'nf_conntrack' > /etc/modules-load.d/nf_conntrack.conf
@@ -538,7 +543,7 @@ fi
 # Если пользователей нет, то создаем новых пользователей 'antizapret-client' для OpenVPN и WireGuard/AmneziaWG
 /root/antizapret/client.sh 7
 
-# Включим обновляемые службы
+# Включим/выключим обновляемые службы
 systemctl enable kresd@1
 systemctl enable kresd@2
 systemctl enable antizapret
@@ -550,6 +555,8 @@ systemctl enable openvpn-server@vpn-udp
 systemctl enable openvpn-server@vpn-tcp
 systemctl enable wg-quick@antizapret
 systemctl enable wg-quick@vpn
+systemctl mask kres-cache-gc
+systemctl disable kres-cache-gc
 
 ERRORS=
 
